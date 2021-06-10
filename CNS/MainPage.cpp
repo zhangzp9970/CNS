@@ -1,4 +1,6 @@
 ﻿#include "pch.h"
+#include "MyMD5.h"
+#include "MySHA256.h"
 #include "MainPage.h"
 #include "MainPage.g.cpp"
 
@@ -8,6 +10,9 @@ using namespace Windows::UI::Xaml;
 using namespace Windows::Foundation;
 using namespace Windows::Storage;
 using namespace Windows::Storage::Pickers;
+using namespace Windows::Storage::Streams;
+using namespace Windows::Security::Cryptography;
+using namespace Windows::Security::Cryptography::Core;
 
 namespace winrt::CNS::implementation
 {
@@ -98,21 +103,28 @@ void winrt::CNS::implementation::MainPage::CancelButtonClick(winrt::Windows::Fou
 
 void winrt::CNS::implementation::MainPage::ActionButtonClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::RoutedEventArgs const& e)
 {
-    string plaintext = to_string(this->LTextBox().Text());
-    this->RTextBox().Text(to_hstring(plaintext));
+    PlainText = this->LTextBox().Text();
+    IBuffer buffUtf8Msg = CryptographicBuffer::ConvertStringToBinary(PlainText, BinaryStringEncoding::Utf8);
+    //this->RTextBox().Text(to_hstring(plaintext));
     if (this->ToF==L"Text")//Text Encrypt
     {
         if (this->MoS==L"MD5")//MD5
         {
-
+            MyMD5 md5;
+            IBuffer MybuffHash = md5.MD5(buffUtf8Msg);
+            HashText = CryptographicBuffer::EncodeToHexString(MybuffHash);
         }
         else if (this->MoS == L"SHA-256")//SHA 256
         {
-
+            MySHA256 sha256;
+            IBuffer MybuffHash = sha256.SHA256(buffUtf8Msg);
+            HashText = CryptographicBuffer::EncodeToHexString(MybuffHash);
         }
         else
         {
-            throw hresult_not_implemented();
+            InfoBar().Severity(muxc::InfoBarSeverity::Error);
+            InfoBar().Message(hstring(L"Select Hash Method!"));
+            InfoBar().IsOpen(true);
         }
     }
     else if (this->ToF == L"File")//File Encrypt
@@ -121,8 +133,11 @@ void winrt::CNS::implementation::MainPage::ActionButtonClick(winrt::Windows::Fou
     }
     else
     {
-        throw hresult_not_implemented();
+        InfoBar().Severity(muxc::InfoBarSeverity::Error);
+        InfoBar().Message(hstring(L"Select text encrypt or file encrypt!"));
+        InfoBar().IsOpen(true);
     }
+    this->RTextBox().Text(HashInfo+HashText);
 }
 
 
@@ -132,22 +147,26 @@ void winrt::CNS::implementation::MainPage::ActionButtonClick(winrt::Windows::Fou
 void winrt::CNS::implementation::MainPage::ToFBoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->ToF = unbox_value<hstring>(e.AddedItems().GetAt(0));
+    InfoBar().IsOpen(false);
 }
 
 
 void winrt::CNS::implementation::MainPage::DoABoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->DoA = unbox_value<hstring>(e.AddedItems().GetAt(0));
+    InfoBar().IsOpen(false);
 }
 
 
 void winrt::CNS::implementation::MainPage::MoSBoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->MoS = unbox_value<hstring>(e.AddedItems().GetAt(0));
+    InfoBar().IsOpen(false);
 }
 
 
 void winrt::CNS::implementation::MainPage::RoSBoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->RoS = unbox_value<hstring>(e.AddedItems().GetAt(0));
+    InfoBar().IsOpen(false);
 }

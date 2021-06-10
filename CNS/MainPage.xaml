@@ -16,17 +16,19 @@
         <StackPanel Height="20"/>
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Top">
             <Run FontSize="18" FontFamily="Comic Sans MS" FontStyle="Italic">
-                God made the integers, all else is the work of man.   --Leopold Kronecker
+                God made the integers, all else is the work of man.  --Leopold Kronecker
             </Run>
         </TextBlock>
-        <StackPanel Height="20"/>
+        <StackPanel Height="10"/>
+        <muxc:InfoBar x:Name="InfoBar" IsOpen="False" Width="750"/>
+        <StackPanel Height="10"/>
         <TextBlock Width="743">
             <Run FontSize="20">
                 Text Encrypt:
             </Run>
         </TextBlock>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBox x:Name="LTextBox" PlaceholderText="Plaintext" TextWrapping="Wrap" AcceptsReturn="True" Height="200" Width="350" IsSpellCheckEnabled="True">
+            <TextBox x:Name="LTextBox" PlaceholderText="Plaintext" TextWrapping="Wrap" AcceptsReturn="True" Height="200" Width="350" IsSpellCheckEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <TextBox.Header>
                     <TextBlock Text="Enter your plaintext:"/>
                 </TextBox.Header>
@@ -35,13 +37,13 @@
                 <StackPanel Height="30"/>
                 <AppBarButton Icon="Shuffle" Width="40" Height="40" Click="ExchangeButtonClick"/>
             </StackPanel>
-            <TextBox x:Name="RTextBox" PlaceholderText="Ciphertext" TextWrapping="Wrap" AcceptsReturn="True" Height="200" Width="350" IsReadOnly="True">
+            <TextBox x:Name="RTextBox" PlaceholderText="Ciphertext" TextWrapping="Wrap" AcceptsReturn="True" Height="200" Width="350" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <TextBox.Header>
                     <TextBlock Text="Your ciphertext:"/>
                 </TextBox.Header>
             </TextBox>
         </StackPanel>
-        <StackPanel Height="20"/>
+        <StackPanel Height="10"/>
         <TextBlock Width="743">
             <Run FontSize="20">
                 File Encrypt:
@@ -55,9 +57,9 @@
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" FontSize="16"/>
             </Button>
         </StackPanel>
-        <StackPanel Height="20"/>
+        <StackPanel Height="10"/>
         <muxc:ProgressBar x:Name="ActionProgressBar" Width="130" IsIndeterminate="True" ShowPaused="True" ShowError="False" />
-        <StackPanel Height="20"/>
+        <StackPanel Height="10"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <ComboBox x:Name="ToFBox" Header="Text / File Encrypt" PlaceholderText="Text or File" Width="127" SelectionChanged="ToFBoxSelectionChanged">
                 <x:String>Text</x:String>
