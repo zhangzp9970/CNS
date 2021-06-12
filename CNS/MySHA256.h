@@ -7,6 +7,7 @@ using namespace Windows::Foundation;
 using namespace Windows::Security::Cryptography;
 using namespace Windows::Security::Cryptography::Core;
 using namespace Windows::Storage::Streams;
+
 class MySHA256
 {
 public:

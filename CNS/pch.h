@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <cmath>
 #include <string>
 #include <windows.h>
 #include <unknwn.h>
@@ -26,4 +27,5 @@
 #include <winrt/Windows.Storage.Streams.h>
 #include <winrt/Windows.Security.Cryptography.h>
 #include <winrt/Windows.Security.Cryptography.Core.h>
-#include <cmath>
+#include <winrt/Windows.Globalization.h>
+#include <winrt/Windows.Globalization.NumberFormatting.h>

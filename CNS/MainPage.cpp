@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "MyMD5.h"
 #include "MySHA256.h"
+#include "MyDES.h"
 #include "MainPage.h"
 #include "MainPage.g.cpp"
 
@@ -13,6 +14,7 @@ using namespace Windows::Storage::Pickers;
 using namespace Windows::Storage::Streams;
 using namespace Windows::Security::Cryptography;
 using namespace Windows::Security::Cryptography::Core;
+using namespace Windows::Globalization::NumberFormatting;
 
 namespace winrt::CNS::implementation
 {
@@ -35,18 +37,18 @@ namespace winrt::CNS::implementation
 
 void winrt::CNS::implementation::MainPage::ExchangeButtonClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::RoutedEventArgs const& e)
 {
-    if (ButtonState == TRUE)
+    if (ButtonState == true)
     {
-        ButtonState = FALSE;
+        ButtonState = false;
         this->LTextBox().Header(winrt::box_value(L"Enter your ciphertext:"));
         this->LTextBox().PlaceholderText(L"Ciphertext");
         this->RTextBox().Header(winrt::box_value(L"Your plaintext:"));
         this->RTextBox().PlaceholderText(L"Plaintext");
         this->ActionButton().Content(winrt::box_value(L"Decrypt"));
     }
-    else if (ButtonState == FALSE)
+    else if (ButtonState == false)
     {
-        ButtonState = TRUE;
+        ButtonState = true;
         this->LTextBox().Header(winrt::box_value(L"Enter your plaintext:"));
         this->LTextBox().PlaceholderText(L"Plaintext");
         this->RTextBox().Header(winrt::box_value(L"Your ciphertext:"));
@@ -103,28 +105,86 @@ void winrt::CNS::implementation::MainPage::CancelButtonClick(winrt::Windows::Fou
 
 void winrt::CNS::implementation::MainPage::ActionButtonClick(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::RoutedEventArgs const& e)
 {
-    PlainText = this->LTextBox().Text();
-    IBuffer buffUtf8Msg = CryptographicBuffer::ConvertStringToBinary(PlainText, BinaryStringEncoding::Utf8);
     //this->RTextBox().Text(to_hstring(plaintext));
     if (this->ToF==L"Text")//Text Encrypt
     {
-        if (this->MoS==L"MD5")//MD5
+        LText = this->LTextBox().Text();
+        if (LText == L"")//no text
         {
-            MyMD5 md5;
-            IBuffer MybuffHash = md5.MD5(buffUtf8Msg);
-            HashText = CryptographicBuffer::EncodeToHexString(MybuffHash);
-        }
-        else if (this->MoS == L"SHA-256")//SHA 256
-        {
-            MySHA256 sha256;
-            IBuffer MybuffHash = sha256.SHA256(buffUtf8Msg);
-            HashText = CryptographicBuffer::EncodeToHexString(MybuffHash);
+            this->InfoBar().Severity(muxc::InfoBarSeverity::Error);
+            this->InfoBar().Message(hstring(L"Input Some Text!"));
+            this->InfoBar().IsOpen(true);
         }
         else
         {
-            InfoBar().Severity(muxc::InfoBarSeverity::Error);
-            InfoBar().Message(hstring(L"Select Hash Method!"));
-            InfoBar().IsOpen(true);
+            if (ButtonState==true)//encrypt
+            {
+                IBuffer buffUtf8Msg = CryptographicBuffer::ConvertStringToBinary(LText, BinaryStringEncoding::Utf8);
+                bool HashFinish = false;
+                if (this->MoS == L"MD5")//MD5
+                {
+                    IBuffer MybuffHash = md5.MD5(buffUtf8Msg);
+                    HashText = CryptographicBuffer::EncodeToHexString(MybuffHash);
+                    HashFinish = true;
+                }
+                else if (this->MoS == L"SHA-256")//SHA 256
+                {
+                    IBuffer MybuffHash = sha256.SHA256(buffUtf8Msg);
+                    HashText = CryptographicBuffer::EncodeToHexString(MybuffHash);
+                    HashFinish = true;
+                }
+                else
+                {
+                    this->InfoBar().Severity(muxc::InfoBarSeverity::Error);
+                    this->InfoBar().Message(hstring(L"Select Hash Method!"));
+                    this->InfoBar().IsOpen(true);
+                }
+                if (HashFinish == true)//do symmetric encryption
+                {
+                    bool PasswordFinish = false;
+                    uint32_t seed = 0;
+                    if (this->RoS==L"Random")
+                    {
+                        des.GenerateSymmetricKey64();
+                        PasswordFinish = true;
+                    }
+                    else if (this->RoS == L"Manual")
+                    {
+                        des.GenerateSymmetricKey64(SKeyBox().Password());
+                        PasswordFinish = true;
+                    }
+                    else
+                    {
+                        this->InfoBar().Severity(muxc::InfoBarSeverity::Error);
+                        this->InfoBar().Message(hstring(L"Select random password or manual password!"));
+                        this->InfoBar().IsOpen(true);
+                    }
+                    if (PasswordFinish == true)
+                    {
+                        if (this->DoA==L"DES")
+                        {
+                            CypherText=des.DESCBC(buffUtf8Msg, ButtonState);
+                        }
+                        else if (this->DoA == L"AES-128")
+                        {
+
+                        }
+                        else
+                        {
+                            this->InfoBar().Severity(muxc::InfoBarSeverity::Error);
+                            this->InfoBar().Message(hstring(L"Select DES or AES-128!"));
+                            this->InfoBar().IsOpen(true);
+                        }
+                    }
+                }
+                this->RTextBox().Text(HashInfo + HashText + CypherInfo + CypherText);
+            }
+            else//decrypt
+            {
+                IBuffer buffUtf8Msg = CryptographicBuffer::DecodeFromHexString(LText);
+                hstring a = des.DESCBC(buffUtf8Msg, ButtonState);
+                this->RTextBox().Text(a);
+            }
         }
     }
     else if (this->ToF == L"File")//File Encrypt
@@ -133,11 +193,10 @@ void winrt::CNS::implementation::MainPage::ActionButtonClick(winrt::Windows::Fou
     }
     else
     {
-        InfoBar().Severity(muxc::InfoBarSeverity::Error);
-        InfoBar().Message(hstring(L"Select text encrypt or file encrypt!"));
-        InfoBar().IsOpen(true);
+        this->InfoBar().Severity(muxc::InfoBarSeverity::Error);
+        this->InfoBar().Message(hstring(L"Select text encrypt or file encrypt!"));
+        this->InfoBar().IsOpen(true);
     }
-    this->RTextBox().Text(HashInfo+HashText);
 }
 
 
@@ -147,26 +206,34 @@ void winrt::CNS::implementation::MainPage::ActionButtonClick(winrt::Windows::Fou
 void winrt::CNS::implementation::MainPage::ToFBoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->ToF = unbox_value<hstring>(e.AddedItems().GetAt(0));
-    InfoBar().IsOpen(false);
+    this->InfoBar().IsOpen(false);
 }
 
 
 void winrt::CNS::implementation::MainPage::DoABoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->DoA = unbox_value<hstring>(e.AddedItems().GetAt(0));
-    InfoBar().IsOpen(false);
+    this->InfoBar().IsOpen(false);
 }
 
 
 void winrt::CNS::implementation::MainPage::MoSBoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->MoS = unbox_value<hstring>(e.AddedItems().GetAt(0));
-    InfoBar().IsOpen(false);
+    this->InfoBar().IsOpen(false);
 }
 
 
 void winrt::CNS::implementation::MainPage::RoSBoxSelectionChanged(winrt::Windows::Foundation::IInspectable const& sender, winrt::Windows::UI::Xaml::Controls::SelectionChangedEventArgs const& e)
 {
     this->RoS = unbox_value<hstring>(e.AddedItems().GetAt(0));
-    InfoBar().IsOpen(false);
+    this->InfoBar().IsOpen(false);
+    if (this->RoS==L"Manual")
+    {
+        this->SKeyBox().IsEnabled(true);
+    }
+    else
+    {
+        this->SKeyBox().IsEnabled(false);
+    }
 }
