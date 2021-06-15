@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 using namespace std;
 using namespace winrt;
@@ -12,9 +13,13 @@ class MyDES
 public:
 	MyDES();
 	~MyDES();
+	hstring Key();
+	void Key(hstring& iData);
+	hstring IV();
+	void IV(hstring& iData);
 	void GenerateSymmetricKey64();
 	void GenerateSymmetricKey64(const hstring key);
-	hstring DESCBC(const IBuffer& data, bool encrypt);
+	hstring DESCBC(const IBuffer& iData, bool encrypt);
 
 private:
 	static const uint8_t PC1[56];

@@ -27,21 +27,28 @@
                 Text Encrypt:
             </Run>
         </TextBlock>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBox x:Name="LTextBox" PlaceholderText="Plaintext" TextWrapping="Wrap" AcceptsReturn="True" Height="200" Width="350" IsSpellCheckEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="215">
+            <TextBox x:Name="LTextBox" PlaceholderText="Plaintext" TextWrapping="Wrap" AcceptsReturn="True" Height="214" Width="350" IsSpellCheckEnabled="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
                 <TextBox.Header>
                     <TextBlock Text="Enter your plaintext:"/>
                 </TextBox.Header>
             </TextBox>
             <StackPanel Width="40" RenderTransformOrigin="-3.5,0.58" Orientation="Vertical">
                 <StackPanel Height="30"/>
-                <AppBarToggleButton Icon="Shuffle" Width="40" Height="40" Click="ExchangeButtonClick" ToolTipService.ToolTip="Choose encrypt or decrypt" Style="{StaticResource AppBarToggleButtonRevealStyle}"/>
+                <AppBarButton Icon="Shuffle" Click="ExchangeButtonClick" ToolTipService.ToolTip="Choose encrypt or decrypt" Style="{StaticResource AppBarButtonRevealStyle}" Height="38" Width="38" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </StackPanel>
-            <TextBox x:Name="RTextBox" PlaceholderText="Ciphertext" TextWrapping="Wrap" AcceptsReturn="True" Height="200" Width="350" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <TextBox.Header>
-                    <TextBlock Text="Your ciphertext:"/>
-                </TextBox.Header>
-            </TextBox>
+            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                <TextBox x:Name="RTextBox" PlaceholderText="Cyphertext" TextWrapping="Wrap" Height="140" Width="350" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <TextBox.Header>
+                        <TextBlock Text="Your cyphertext:"/>
+                    </TextBox.Header>
+                </TextBox>
+                <TextBox x:Name="RKTextBox" PlaceholderText="Cypherkey" TextWrapping="Wrap" Height="75" Width="350" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <TextBox.Header>
+                        <TextBlock Text="Your cypherkey:"/>
+                    </TextBox.Header>
+                </TextBox>
+            </StackPanel>
         </StackPanel>
         <StackPanel Height="10"/>
         <TextBlock Width="743">
@@ -49,16 +56,18 @@
                 File Encrypt:
             </Run>
         </TextBlock>
-        <Button x:Name="BrowseButton" Content="Browse your computer" Click="BrowseButtonClick" HorizontalAlignment="Center" Style="{ThemeResource ButtonRevealStyle}" ToolTipService.ToolTip="Select a file to encrypt"/>
-        <StackPanel Height="10"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button x:Name="ContentButton" Content="File" HorizontalAlignment="Center" Height="35" Style="{ThemeResource ButtonRevealStyle}" Visibility="Collapsed"/>
+            <Button x:Name="BrowseButton" Content="Browse your computer" Height="35" Click="BrowseButtonClick" Style="{ThemeResource ButtonRevealStyle}" ToolTipService.ToolTip="Select a file to encrypt" IsEnabled="False"/>
+            <StackPanel Width="10"/>
+            <Button x:Name="ContentButton" Content="" Height="35" Style="{ThemeResource ButtonRevealStyle}" Visibility="Collapsed"/>
             <Button x:Name="CancelButton" HorizontalAlignment="Center" Height="35" Style="{ThemeResource ButtonRevealStyle}"  Visibility="Collapsed" Click="CancelButtonClick" ToolTipService.ToolTip="Remove the file">
                 <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE894;" FontSize="16"/>
             </Button>
+            <StackPanel Width="10"/>
+            <Button x:Name="SaveButton" Content="Save file" Style="{ThemeResource ButtonRevealStyle}" Visibility="Collapsed" Click="SaveButtonClick" ToolTipService.ToolTip="Save file"/>
         </StackPanel>
         <StackPanel Height="10"/>
-        <muxc:ProgressBar x:Name="ActionProgressBar" Width="130" IsIndeterminate="True" ShowPaused="True" ShowError="False" />
+        <muxc:ProgressRing x:Name="ActionProgressRing" IsActive="False"/>
         <StackPanel Height="10"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
             <StackPanel Orientation="Vertical">
@@ -81,37 +90,39 @@
                     </ComboBox>
                 </StackPanel>
                 <StackPanel Height="5"/>
-                <Button Content="About" Style="{ThemeResource ButtonRevealStyle}" ToolTipService.ToolTip="About this app">
-                    <Button.Flyout>
-                        <Flyout>
-                            <StackPanel HorizontalAlignment="Left">
-                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="About" FontSize="20"/>
-                                <StackPanel Height="5"/>
-                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Crypto System 2.1.0" FontSize="15"/>
-                                <TextBlock Text="Copyright © 2021 Zeping Zhang"/>
-                                <StackPanel Height="5"/>
-                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Licence" FontSize="15"/>
-                                <TextBlock Text="This software is distributed under the GNU General Public Licence (GPLv3)" TextWrapping="Wrap" Width="300"/>
-                                <StackPanel Height="5"/>
-                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Third party libraries" FontSize="15"/>
-                                <HyperlinkButton Content="WinUI" NavigateUri="https://aka.ms/winui" />
-                                <HyperlinkButton Content="Microsoft/cppwinrt" NavigateUri="https://aka.ms/cppwinrt" />
-                                <HyperlinkButton Content="Silenceneo-xw/RSA" NavigateUri="https://www.cnblogs.com/Silenceneo-xw/p/6718334.html" />
-                                <StackPanel Height="5"/>
-                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Acknowledgements" FontSize="15"/>
-                                <TextBlock Text="Xiaowen Wang, Zhouhong Wang, Xiangyu Zhao, Mengjia Ding"  TextWrapping="Wrap" Width="300"/>
-                            </StackPanel>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="About" Style="{ThemeResource ButtonRevealStyle}" ToolTipService.ToolTip="About this app">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel HorizontalAlignment="Left">
+                                    <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="About" FontSize="20"/>
+                                    <StackPanel Height="5"/>
+                                    <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Crypto System 2.1.0" FontSize="15"/>
+                                    <TextBlock Text="Copyright © 2021 Zeping Zhang"/>
+                                    <StackPanel Height="5"/>
+                                    <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Licence" FontSize="15"/>
+                                    <TextBlock Text="This software is distributed under the GNU General Public Licence (GPLv3)" TextWrapping="Wrap" Width="300"/>
+                                    <StackPanel Height="5"/>
+                                    <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Third party libraries" FontSize="15"/>
+                                    <HyperlinkButton Content="WinUI" NavigateUri="https://aka.ms/winui" />
+                                    <HyperlinkButton Content="Microsoft/cppwinrt" NavigateUri="https://aka.ms/cppwinrt" />
+                                    <HyperlinkButton Content="Silenceneo-xw/RSA" NavigateUri="https://www.cnblogs.com/Silenceneo-xw/p/6718334.html" />
+                                    <StackPanel Height="5"/>
+                                    <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="Acknowledgements" FontSize="15"/>
+                                    <TextBlock Text="Xiaowen Wang, Zhouhong Wang, Mengjia Ding"  TextWrapping="Wrap" Width="300"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Vertical">
                 <PasswordBox x:Name="SKeyBox" Header="Symmetric key: " PlaceholderText="Key"  IsEnabled="False" MaxLength="8"/>
                 <StackPanel Height="5"/>
                 <StackPanel Orientation="Horizontal">
-                    <Button x:Name="GenerateRSAButton" Content="Generate Key Pair" Style="{ThemeResource ButtonRevealStyle}" VerticalAlignment="Bottom" ToolTipService.ToolTip="Generate RSA key pairs"/>
+                    <Button x:Name="GenerateRSAButton" Content="Generate Key Pair" Style="{ThemeResource ButtonRevealStyle}" VerticalAlignment="Bottom" ToolTipService.ToolTip="Generate RSA key pairs" Click="GenerateRSAButtonClick"/>
                     <StackPanel Width="10"/>
-                    <Button x:Name="ActionButton" Content="Encrypt" Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Bottom" Click="ActionButtonClick" ToolTipService.ToolTip="Encrypt or decrypt"/>
+                    <Button x:Name="ActionButton" Content="Encrypt" Style="{StaticResource AccentButtonStyle}" VerticalAlignment="Bottom" Click="ActionButtonClick" ToolTipService.ToolTip="Encrypt or decrypt" IsEnabled="False"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

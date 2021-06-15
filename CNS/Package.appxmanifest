@@ -2,12 +2,12 @@
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
   <Identity
     Name="be7d9720-7df4-46ec-a110-540bf0ff3028"
-    Publisher="CN=zzp"
-    Version="1.0.0.0" />
+    Publisher="CN=张泽平"
+    Version="2.1.0.0" />
   <mp:PhoneIdentity PhoneProductId="be7d9720-7df4-46ec-a110-540bf0ff3028" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
     <DisplayName>CNS</DisplayName>
-    <PublisherDisplayName>zzp</PublisherDisplayName>
+    <PublisherDisplayName>张泽平</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -18,11 +18,16 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="CNS.App">
-      <uap:VisualElements DisplayName="CNS" Description="Project for a single page C++/WinRT Universal Windows Platform (UWP) app with no predefined layout"
+      <uap:VisualElements DisplayName="CNS" Description="Crypto System designed by Zeping Zhang"
         Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" Square71x71Logo="Assets\SmallTile.png" Square310x310Logo="Assets\LargeTile.png">
         </uap:DefaultTile>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/>
+          <uap:Rotation Preference="portrait"/>
+          <uap:Rotation Preference="landscapeFlipped"/>
+          <uap:Rotation Preference="portraitFlipped"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>

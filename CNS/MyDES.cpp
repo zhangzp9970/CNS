@@ -16,6 +16,36 @@ MyDES::~MyDES()
 {
 }
 
+hstring MyDES::Key()
+{
+	return CryptographicBuffer::EncodeToHexString(CryptographicBuffer::CreateFromByteArray(this->Key64));
+}
+
+void MyDES::Key(hstring& iData)
+{
+	com_array<uint8_t> key;
+	CryptographicBuffer::CopyToByteArray(CryptographicBuffer::DecodeFromHexString(iData),key);
+	for (size_t i = 0; i < 8; i++)
+	{
+		this->Key64[i] = key.at(i);
+	}
+}
+
+hstring MyDES::IV()
+{
+	return CryptographicBuffer::EncodeToHexString(CryptographicBuffer::CreateFromByteArray(this->IV64));
+}
+
+void MyDES::IV(hstring& iData)
+{
+	com_array<uint8_t> iv;
+	CryptographicBuffer::CopyToByteArray(CryptographicBuffer::DecodeFromHexString(iData), iv);
+	for (size_t i = 0; i < 8; i++)
+	{
+		this->IV64[i] = iv.at(i);
+	}
+}
+
 void MyDES::GenerateSymmetricKey64()
 {
 	GenerateRandom64(this->Key64);
@@ -24,20 +54,26 @@ void MyDES::GenerateSymmetricKey64()
 void MyDES::GenerateSymmetricKey64(const hstring key)
 {
 	int i = 0;
+	time_t t;
+	srand(time(&t));
 	for each (uint8_t item in to_string(key))
 	{
 		Key64[i++] = item;
 	}
+	while (i<8)
+	{
+		Key64[i++] = rand();
+	}
 }
 
-hstring MyDES::DESCBC(const IBuffer& data, bool encrypt)
+hstring MyDES::DESCBC(const IBuffer& iData, bool encrypt)
 {
 	hstring oText = L"";
 	//uint8_t key[8] = { 0,1,2,3,4,5,6,7 };
 	uint8_t iBlock64[8] = { 0,0,0,0,0,0,0,0 };
 	uint8_t oBlock64[8] = { 0,0,0,0,0,0,0,0 };
 	uint8_t IV[8] = { 0,0,0,0,0,0,0,0 };
-	DataReader dr = DataReader::FromBuffer(data);
+	DataReader dr = DataReader::FromBuffer(iData);
 	if (encrypt)
 	{
 		GenerateRandom64(this->IV64);
