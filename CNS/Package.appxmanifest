@@ -3,7 +3,7 @@
   <Identity
     Name="be7d9720-7df4-46ec-a110-540bf0ff3028"
     Publisher="CN=张泽平"
-    Version="2.1.0.0" />
+    Version="2.1.1.0" />
   <mp:PhoneIdentity PhoneProductId="be7d9720-7df4-46ec-a110-540bf0ff3028" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
     <DisplayName>CNS</DisplayName>
